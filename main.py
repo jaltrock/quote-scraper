@@ -16,7 +16,8 @@ def init_db():
         cursor.execute("""
             CREATE TABLE IF NOT EXISTS quotes (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
-                chapter TEXT UNIQUE,
+                chapter_title TEXT,
+                chapter_url TEXT UNIQUE,
                 quote TEXT
             )
         """)
@@ -24,34 +25,55 @@ def init_db():
 
 init_db()
 
-# Function to get all chapter links
+# Function to get all chapter links and titles
 def get_chapter_links():
     response = requests.get(TOC_URL)
     soup = BeautifulSoup(response.text, 'html.parser')
-    links = [a['href'] for a in soup.select("a[href*='/201']")]
-    return links
+    
+    chapters = []
+    
+    # Find all <li> elements inside div.entry-content
+    for li in soup.select("div.entry-content li"):
+        link_tag = li.find("a")
+        if link_tag and "href" in link_tag.attrs:
+            chapter_title = link_tag.text.strip()
+            chapter_url = link_tag["href"]
+            chapters.append((chapter_title, chapter_url))
 
-# Function to scrape quotes from chapters
+    return chapters
+
+# Function to scrape the first paragraph inside "entry-content"
 def get_chapter_quote(chapter_url):
     response = requests.get(chapter_url)
-    soup = BeautifulSoup(response.text, 'html.parser')
-    quote_tag = soup.find("blockquote")
-    return quote_tag.text.strip() if quote_tag else None
+    if response.status_code != 200:
+        return None  # Skip if page can't be loaded
 
-# Background task to scrape and store quotes with retry mechanism
+    soup = BeautifulSoup(response.text, 'html.parser')
+    
+    # Find the main content div
+    content_div = soup.find("div", class_="entry-content")
+    if not content_div:
+        return None  # If div is missing, return None
+    
+    # Get the first paragraph inside entry-content
+    first_paragraph = content_div.find("p")
+    
+    return first_paragraph.get_text(strip=True) if first_paragraph else None
+
+# Background task to scrape and store quotes
 def scrape_and_store(retries=5, delay=1):
     chapter_links = get_chapter_links()
     
-    for link in chapter_links:
-        quote = get_chapter_quote(link)
+    for chapter_title, chapter_url in chapter_links:
+        quote = get_chapter_quote(chapter_url)
         if quote:
             for attempt in range(retries):
                 try:
                     with sqlite3.connect(DB_FILE, check_same_thread=False) as conn:
                         cursor = conn.cursor()
                         cursor.execute(
-                            "INSERT OR IGNORE INTO quotes (chapter, quote) VALUES (?, ?)", 
-                            (link, quote)
+                            "INSERT OR IGNORE INTO quotes (chapter_title, chapter_url, quote) VALUES (?, ?, ?)", 
+                            (chapter_title, chapter_url, quote)
                         )
                         conn.commit()
                     break  # Success, exit retry loop
@@ -66,9 +88,9 @@ def scrape_and_store(retries=5, delay=1):
 def get_quotes():
     with sqlite3.connect(DB_FILE, check_same_thread=False) as conn:
         cursor = conn.cursor()
-        cursor.execute("SELECT chapter, quote FROM quotes")
+        cursor.execute("SELECT chapter_title, chapter_url, quote FROM quotes ORDER BY id")
         data = cursor.fetchall()
-    return [{"chapter": row[0], "quote": row[1]} for row in data]
+    return [{"chapter": row[0], "url": row[1], "quote": row[2]} for row in data]
 
 @app.post("/scrape")
 def trigger_scrape(background_tasks: BackgroundTasks):
