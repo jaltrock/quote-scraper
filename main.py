@@ -1,7 +1,7 @@
 from fastapi import FastAPI, BackgroundTasks
 import sqlite3
 import requests
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup 
 import time
 
 app = FastAPI()
