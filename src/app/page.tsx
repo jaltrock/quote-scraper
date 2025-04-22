@@ -4,7 +4,7 @@ type Quote = {
 };
 
 export default async function HomePage() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/quotes`);
+  const res = await fetch("https://practical-guide-api.onrender.com");
   const data: Quote[] = await res.json();
 
 

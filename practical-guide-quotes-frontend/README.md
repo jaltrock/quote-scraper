@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -34,3 +35,13 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+=======
+This program will collect the quotes from the beginning of each chapter of the series A Practical Guide to Evil:
+
+https://practicalguidetoevil.wordpress.com/summary/
+
+The quotes will then be compiled in a single page.
+
+For the backend, I used Python and FastAPI to handle the scraping and API requests. 
+On the frontend, I've displayed the quotes using Next.js.
+>>>>>>> dbd02286628aa51568e813569d1f9c16f874535f
