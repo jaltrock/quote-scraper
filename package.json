@@ -1,0 +1,25 @@
+{
+  "name": "quote-scraper",
+  "version": "1.0.0",
+  "description": "This program will collect the quotes from the beginning of each chapter of the series A Practical Guide to Evil:",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jaltrock/quote-scraper.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jaltrock/quote-scraper/issues"
+  },
+  "homepage": "https://github.com/jaltrock/quote-scraper#readme",
+  "dependencies": {
+    "next": "^15.2.4",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0"
+  }
+}
