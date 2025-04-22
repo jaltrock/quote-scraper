@@ -96,3 +96,8 @@ def get_quotes():
 def trigger_scrape(background_tasks: BackgroundTasks):
     background_tasks.add_task(scrape_and_store)
     return {"message": "Scraping started in the background."}
+
+
+@app.get("/")
+def root():
+    return {"message": "FastAPI is alive!"}
