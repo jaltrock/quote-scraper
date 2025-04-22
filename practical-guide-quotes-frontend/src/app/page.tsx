@@ -1,23 +1,31 @@
+"use client";
+
+import { useEffect, useState } from "react";
+
 type Quote = {
   chapter: string;
   quote: string;
 };
 
-export default async function HomePage() {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/quotes`);
-  const data: Quote[] = await res.json();
+export default function HomePage() {
+  const [quotes, setQuotes] = useState<Quote[]>([]);
 
+  useEffect(() => {
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/quotes`)
+      .then((res) => res.json())
+      .then((data) => setQuotes(data))
+      .catch((err) => console.error("Failed to load quotes:", err));
+  }, []);
 
-  let currentBook = 1; // Start from Book 1
+  let currentBook = 1;
 
   return (
     <div className="p-6 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-6 text-center">
-        Quotes from &quot;A Practical Guide to Evil&quot;
+        Quotes from "A Practical Guide to Evil"
       </h1>
 
-      {data.map((item, index) => {
-        // Check if the current chapter is "Prologue" and insert a Book heading before it
+      {quotes.map((item, index) => {
         const isPrologue = item.chapter.toLowerCase().includes("prologue");
         let bookHeading = null;
 
@@ -27,13 +35,13 @@ export default async function HomePage() {
               Book {currentBook}
             </h2>
           );
-          currentBook++; // Move to the next book after the Prologue
+          currentBook++;
         }
 
         return (
           <div key={index} className="mb-6">
-            {bookHeading} {/* Insert the book title before the prologue */}
-            <p className="text-lg italic">{item.quote}</p>
+            {bookHeading}
+            <p className="text-lg italic">"{item.quote}"</p>
             <p className="text-sm text-gray-600 mt-2">— {item.chapter}</p>
           </div>
         );

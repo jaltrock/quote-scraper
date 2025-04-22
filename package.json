@@ -1,25 +1,24 @@
 {
-  "name": "quote-scraper",
-  "version": "1.0.0",
-  "description": "This program will collect the quotes from the beginning of each chapter of the series A Practical Guide to Evil:",
-  "main": "index.js",
+  "name": "practical-guide-quotes-frontend",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/jaltrock/quote-scraper.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/jaltrock/quote-scraper/issues"
-  },
-  "homepage": "https://github.com/jaltrock/quote-scraper#readme",
   "dependencies": {
-    "next": "^15.2.4",
-    "react": "^19.1.0",
-    "react-dom": "^19.1.0"
+    "next": "15.2.4",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest",
+    "eslint": "latest",
+    "eslint-config-next": "latest",
+    "typescript": "latest"
   }
 }
