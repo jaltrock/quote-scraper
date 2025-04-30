@@ -1,10 +1,21 @@
 from fastapi import FastAPI, BackgroundTasks
+from fastapi.middleware.cors import CORSMiddleware
 import sqlite3
 import requests
 from bs4 import BeautifulSoup 
 import time
 
 app = FastAPI()
+
+# ✅ Fix CORS so the frontend can make requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Change to ["http://localhost:3000"] in development or your domain in prod
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 DB_FILE = "quotes.db"
 TOC_URL = "https://practicalguidetoevil.wordpress.com/table-of-contents/"
 
@@ -31,8 +42,6 @@ def get_chapter_links():
     soup = BeautifulSoup(response.text, 'html.parser')
     
     chapters = []
-    
-    # Find all <li> elements inside div.entry-content
     for li in soup.select("div.entry-content li"):
         link_tag = li.find("a")
         if link_tag and "href" in link_tag.attrs:
@@ -46,18 +55,14 @@ def get_chapter_links():
 def get_chapter_quote(chapter_url):
     response = requests.get(chapter_url)
     if response.status_code != 200:
-        return None  # Skip if page can't be loaded
+        return None
 
     soup = BeautifulSoup(response.text, 'html.parser')
-    
-    # Find the main content div
     content_div = soup.find("div", class_="entry-content")
     if not content_div:
-        return None  # If div is missing, return None
+        return None
     
-    # Get the first paragraph inside entry-content
     first_paragraph = content_div.find("p")
-    
     return first_paragraph.get_text(strip=True) if first_paragraph else None
 
 # Background task to scrape and store quotes
@@ -76,13 +81,13 @@ def scrape_and_store(retries=5, delay=1):
                             (chapter_title, chapter_url, quote)
                         )
                         conn.commit()
-                    break  # Success, exit retry loop
+                    break
                 except sqlite3.OperationalError as e:
                     if "database is locked" in str(e):
                         print(f"Database is locked, retrying {attempt+1}/{retries}...")
-                        time.sleep(delay)  # Wait before retrying
+                        time.sleep(delay)
                     else:
-                        raise  # If it's another error, raise it
+                        raise
 
 @app.get("/quotes")
 def get_quotes():
@@ -96,7 +101,6 @@ def get_quotes():
 def trigger_scrape(background_tasks: BackgroundTasks):
     background_tasks.add_task(scrape_and_store)
     return {"message": "Scraping started in the background."}
-
 
 @app.get("/")
 def root():
